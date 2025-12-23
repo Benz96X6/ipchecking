@@ -1,17 +1,42 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request
 from user_agents import parse
 from datetime import datetime
 import requests
-import os  # <-- ต้อง import os เพื่ออ่าน environment variable
+import os
 
 app = Flask(__name__)
 
-# ใส่ Discord Webhook ผ่าน Environment Variable (ปลอดภัยกว่า)
-WEBHOOK_URL = os.environ.get("https://discord.com/api/webhooks/1453051676423618590/-mvVCRBnzPKALk_3WqPx8AKL8vssSXBvOUIicvCfJieCl7EHmgQ_4qqIiJbKcxu1HyaW")
+# ใส่ Discord Webhook ผ่าน Environment Variable
+WEBHOOK_URL = os.environ.get("https://discord.com/api/webhooks/1453051676423618590/-mvVCRBnzPKALk_3WqPx8AKL8vssSXBvOUIicvCfJieCl7EHmgQ_4qqIiJbKcxu1HyaW", "ใส่ webhook ของคุณตรงนี้ถ้าอยากทดสอบ")
 
 @app.route("/")
 def home():
-    return render_template("index.html")  # หน้า HTML ของคุณ
+    # ส่ง HTML + JS แบบ inline เลย ไม่ต้องสร้าง index.html
+    return """
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Visitor Logger</title>
+</head>
+<body>
+  <h1>Hello 👋</h1>
+
+  <script>
+    fetch("/log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        screen: `${screen.width}x${screen.height}`,
+        platform: navigator.platform,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        touch: navigator.maxTouchPoints > 0 ? "Yes" : "No"
+      })
+    });
+  </script>
+</body>
+</html>
+"""
 
 @app.route("/log", methods=["POST"])
 def log_visitor():
@@ -40,9 +65,8 @@ Touch Support: `{data.get("touch")}`
     except Exception as e:
         print("Error sending to Discord:", e)
 
-    return jsonify({"status": "ok"})
+    return {"status": "ok"}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # ใช้ port ของ Render
-    app.run(host="0.0.0.0", port=port)        # host ต้องเป็น 0.0.0.0
-
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
