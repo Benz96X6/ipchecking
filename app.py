@@ -7,7 +7,7 @@ import os  # <-- ต้อง import os เพื่ออ่าน environment 
 app = Flask(__name__)
 
 # ใส่ Discord Webhook ผ่าน Environment Variable (ปลอดภัยกว่า)
-WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK")
+WEBHOOK_URL = os.environ.get("https://discord.com/api/webhooks/1453051676423618590/-mvVCRBnzPKALk_3WqPx8AKL8vssSXBvOUIicvCfJieCl7EHmgQ_4qqIiJbKcxu1HyaW")
 
 @app.route("/")
 def home():
@@ -45,3 +45,4 @@ Touch Support: `{data.get("touch")}`
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # ใช้ port ของ Render
     app.run(host="0.0.0.0", port=port)        # host ต้องเป็น 0.0.0.0
+
